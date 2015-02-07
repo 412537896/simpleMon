@@ -12,15 +12,17 @@
 </head>
 <body>
 <div id="header">
-	<div id="logoDiv"><img src="123123.jpg" >
+	<div id="logoDiv"><img src="reboot.jpg" >
 	</div>
         <ul class="nav nav-pills" role="tablist">
-          <li role="presentation" class="active"><a href="#">sohu</a></li>
+          <li role="presentation" class="active"><a href="#">baidu</a></li>
+          <li role="presentation"><a href="/scmd">批量执行</a></li>
           <li role="presentation" class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
               监控 <span class="caret"></span>
             </a>
             <ul class="dropdown-menu" role="menu">
+                <li role="presentation"><a href="#">host</a></li>
                 <li role="presentation"><a href="#">redis</a></li>
                 <li role="presentation"><a href="#">memcache</a></li>
                 <li role="presentation"><a href="#">mysql</a></li>
@@ -47,15 +49,6 @@
                 <li role="presentation"><a href="#">Profile</a></li>
             </ul>
           </li>
-            <li role="presentation" class="dropdown">
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-              批量管理 <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu" role="menu">
-                <li role="presentation"><a href="#">nginx</a></li>
-                <li role="presentation"><a href="#">api</a></li>
-                <li role="presentation"><a href="#">Profile</a></li>
-            </ul>
           </li>
             <li role="presentation" class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -111,7 +104,7 @@
         
 	</div><!--leftDiv-->
 	<div class="rightDiv">
-        <div >
+        <div style="width:1100px;height:300px">
             <div id="load_container" style="width:550px;height:300px;float:left;"></div>
             <div id="mem_container" style="width:550px;height:300px;"></div>
         </div>

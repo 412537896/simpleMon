@@ -5,7 +5,6 @@ import sys, time
 import urllib2
 import json
 import framework
-from moniItems import mon
 from daemon import Daemon
 
 class MyDaemon(Daemon):

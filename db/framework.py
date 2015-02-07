@@ -44,7 +44,7 @@ class execThread(threading.Thread):
 
 
 def startTh():
-    execTh = execThread("0.0.0.0", 50003)
+    execTh = execThread("0.0.0.0", 50013)
     execTh.start()
     print  "start"
     execTh.join()

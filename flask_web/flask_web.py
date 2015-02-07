@@ -1,11 +1,13 @@
 #!/usr/bin/env python
+#encoding:utf8
 import json
-import time
+import time,random
 import MySQLdb as mysql
 from flask import Flask, request
 import sys, os
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 from controller.client import *
+from nbNet.nbNet import sendData
 
 app = Flask(__name__)
 db = mysql.connect(user="reboot", passwd="reboot123", \
@@ -52,6 +54,7 @@ def load():
     try:  
         #hostname = request.form.get("hostname")
         atime = int(time.time() - 86400)
+        print atime
         sql = "SELECT `time`,`load` FROM `statusinfo` WHERE hostname = '%s' and time > '%d' ;" % ('teach.works',atime)
         c.execute(sql)
         ones = c.fetchall() 
@@ -77,7 +80,6 @@ def mem():
         for i in ones:
             mem_free_list.append([ i[0] * 1000 + 28800000 ,i[1] ])
             mem_usage_list.append([ i[0] * 1000 + 28800000 ,i[2] ])
-        print json.dumps([mem_free_list,mem_usage_list])
         return json.dumps([mem_free_list,mem_usage_list])
 
     except:
@@ -91,10 +93,9 @@ def show():
         c.execute(sql)
         ones = c.fetchall()
 
-        print ones
         return render_template("sysstatus.html", data=ones, sql = sql)
     except:
-        print 'hostname null'
+        return 'hostname null'
 @app.route("/list", methods=["GET", "POST"])
 def list():
     page = request.args.get('page', 1)
@@ -114,6 +115,49 @@ def ctl():
     else:
         return render_template("control.html", output="")
 
+@app.route("/scmd", methods=["GET", "POST"])
+def scmd():
+    if request.method == "POST":
+        hostlist = request.form.get("client").split(',')
+        cmd = request.form.get('cmd')
+        if hostlist[0] != '' and len(cmd) != 0:
+            taskid = int(time.time()) * 1000 + random.randrange(900)
+            jsonData = json.dumps({"Operation":"sendCmd","hostlist":hostlist, "cmd":cmd,'taskid':taskid} )
+            host = 'reboot'
+            port = 50005
+            output = ''
+            try:
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.connect((host, port))
+                s.sendall("%010d%s"%(len(jsonData), jsonData))
+                count = s.recv(10)
+                if not count:
+                    sys.exit()
+                count = int(count)
+                while count > 0:
+                    buf = s.recv(count)
+                    count -= len(buf)
+                    output += buf
+                s.close()
+                return json.dumps({"output":output,"taskid":taskid,"cmd":cmd})
+            except:
+                return json.dumps({"output":"ERROR: %s %s unable to connect " %(host,port),"taskid":"null","cmd":cmd})
+        else:
+            return json.dumps({"output":"ERROR: cmd or hostlist null","taskid":"null","cmd":cmd})
+    else:
+        return render_template("runcmd.html", output="", taskid="", cmd="")
+@app.route("/cmdreturns", methods=["GET", "POST"])
+def cmdreturns():
+    try:
+        taskid = request.args.get('taskid', 'null')
+        if taskid != "null":
+            sql = "SELECT `hostname`,`rtime`,`retstat`,`out` FROM `cmdresult` WHERE taskid = '%s';" % (taskid)
+            c.execute(sql)
+            ones = c.fetchall()
+            return json.dumps(ones)
+        return 'taskid null'
+    except:
+        return 'taskid null'
 
 from flask import render_template
 @app.route("/xxx/<name>")
@@ -122,5 +166,6 @@ def hello_xx(name):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=50004, debug=True)
+
 
 
